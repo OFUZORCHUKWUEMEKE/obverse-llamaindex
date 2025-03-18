@@ -12,3 +12,4 @@ solders
 fastapi
 marshmallow
 llama_index
+motor
