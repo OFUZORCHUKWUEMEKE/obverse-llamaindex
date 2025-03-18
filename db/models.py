@@ -11,7 +11,6 @@ class PaymentStatus(Enum):
 class Chain(Enum):
     SOLANA='solana'
 
-
 class UserSchema(BaseModel):
     username:str
     telegram_id:str
@@ -23,7 +22,6 @@ class UserSchema(BaseModel):
     total_transactions:int=0
     logo_url:Optional[str] = None
 
-
 class PaymentSchema(BaseModel):
     amount:float
     currency:str
@@ -32,10 +30,14 @@ class PaymentSchema(BaseModel):
     user_id:str
     payment_link:str
     chain:Chain=Chain.SOLANA
-    created_at:datetime=datetime.now()
-    updated_at:datetime=datetime.now()
     reference:str
     transaction_hash:Optional[str]
     expires_at:Optional[datetime]
     metadata:Optional[Dict[str, any]] = None
     logo_url:Optional[str]
+    created_at:datetime=datetime.now()
+    updated_at:datetime=datetime.now()
+
+# MongoDB connection
+client = MongoClient("your_mongodb_uri")
+db = client["your_database_name"]

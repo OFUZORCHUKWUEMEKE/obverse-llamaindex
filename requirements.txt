@@ -11,3 +11,4 @@ solana
 solders
 fastapi
 marshmallow
+llama_index
