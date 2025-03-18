@@ -2,6 +2,7 @@ from datetime import datetime
 from typings import Optional
 from pydantic import BaseModel
 from enum import Enum
+from core.config import config
 
 class PaymentStatus(Enum):
     PENDING = "pending"
@@ -21,6 +22,10 @@ class UserSchema(BaseModel):
     wallet_addresses:Optional[List[str]] = None
     total_transactions:int=0
     logo_url:Optional[str] = None
+   
+    class Config:
+        orm_mode = True
+        json_encoders = {ObjectId: str}
 
 class PaymentSchema(BaseModel):
     amount:float
@@ -38,6 +43,10 @@ class PaymentSchema(BaseModel):
     created_at:datetime=datetime.now()
     updated_at:datetime=datetime.now()
 
+    class Config:
+        orm_mode = True
+        json_encoders = {ObjectId: str}
+
 # MongoDB connection
-client = MongoClient("your_mongodb_uri")
-db = client["your_database_name"]
+client = MongoClient(config.MONGO_URL)
+db = client["obverse_dev"]
