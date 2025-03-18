@@ -1,0 +1,13 @@
+llama-index
+pydantic
+pydantic[email]
+python-dotenv
+python-telegram-bot
+llama_index.llms.gemini
+uvicorn
+python-telegram-bot
+pymongo
+solana
+solders
+fastapi
+marshmallow
