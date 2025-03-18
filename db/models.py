@@ -8,6 +8,10 @@ class PaymentStatus(Enum):
     SUCCESSFUL = "successful"
     FAILED = "failed"
 
+class Chain(Enum):
+    SOLANA='solana'
+
+
 class UserSchema(BaseModel):
     username:str
     telegram_id:str
@@ -26,3 +30,12 @@ class PaymentSchema(BaseModel):
     type:Optional[str]=None
     status:PaymentStatus=PaymentStatus.PENDING
     user_id:str
+    payment_link:str
+    chain:Chain=Chain.SOLANA
+    created_at:datetime=datetime.now()
+    updated_at:datetime=datetime.now()
+    reference:str
+    transaction_hash:Optional[str]
+    expires_at:Optional[datetime]
+    metadata:Optional[Dict[str, any]] = None
+    logo_url:Optional[str]
