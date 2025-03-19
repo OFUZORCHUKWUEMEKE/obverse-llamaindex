@@ -1,6 +1,6 @@
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
-
+from core.config import config
 
 MONGO_URI = os.getenv("MONGO_URL")
 DB_NAME="obverse_dev"

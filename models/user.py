@@ -1,5 +1,5 @@
 from .base import BaseSchema
-from typings import Optional , List
+from typing import Optional , List
 
 class UserSchema(BaseSchema):
     username:str
