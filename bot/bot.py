@@ -7,14 +7,30 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from agents.agent import llm
 from core.config import config
+from repositories.user_repository import create_user,get_user
+from models.user import UserSchema
 
 
 async def start(update:Update,context:ContextTypes.DEFAULT_TYPE):
-    user = update.message.from_user
-    await update.message.reply_text(
-        f"Hello! {user.first_name}, Welcome to Obverse\n" 
-        f"Obverse is a Stablecoin Payment management agent that helps businesses / Individuals collect fiat payments through links and QRcodes\n"
-    )
+    user_info = update.message.from_user
+    telegram_user = update.effective_user # Extract user details
+    existing_user = await get_user(str(telegram_user.id))
+    if existing_user:
+        await update.message.reply_text(
+            f"Hello! {user_info.first_name}, Welcome to Obverse\n" 
+            f"Obverse is a Stablecoin Payment management agent that helps businesses / Individuals collect fiat payments through links and QRcodes\n"
+        )
+    else:
+        user_data = UserSchema(
+          username=telegram_user.username,
+          first_name=telegram_user.first_name,
+          last_name=telegram_user.last_name,
+          telegram_id=str(telegram_user.id)
+        )
+        user = await create_user(user_data) 
+        await update.message.reply_text(
+          f"Hello! {user_info.first_name}, Welcome to Obverse\n" 
+          f"Obverse is a Stablecoin Payment management agent that helps businesses / Individuals collect fiat payments through links and QRcodes\n" )
 
 # Define a handler for echoing text messages
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
