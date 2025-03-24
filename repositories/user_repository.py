@@ -1,5 +1,5 @@
 from database.collections import users_collection
-from models.user import UserSchema
+from models.user import UserSchema, UpdateUser
 from bson import ObjectId
 
 async def create_user(user:UserSchema):
@@ -24,7 +24,7 @@ async def get_users(page:int=1, limit:int=10):
     users = await users_collection.find().skip(skip).limit(limit).to_list(length=limit)
     return users
 
-async def update_user(telegram_id:str, user:UserSchema):
+async def update_user(telegram_id:str, user:UpdateUser):
     user_dict = user.dict(by_alias=True)
     await users_collection.update_one({"telegram_id":telegram_id}, {"$set":user_dict})
     return {"message":"User updated successfully"}

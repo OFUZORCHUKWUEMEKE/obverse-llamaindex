@@ -12,3 +12,9 @@ class UserSchema(BaseSchema):
     total_transactions:int=0
     logo_url:Optional[str] = None
 
+class UpdateUser(BaseSchema):
+    username:Optional[str]
+    first_name:Optional[str]
+    last_name:Optional[str]
+    merchant_name:Optional[str]
+    logo_url:Optional[str]
