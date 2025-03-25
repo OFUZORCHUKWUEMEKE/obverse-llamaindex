@@ -104,8 +104,6 @@ async def user_input_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
     response = f"✅ Updated *{selected_option.replace('_', ' ')}* with:\n\n`{user_text}`"
     await update.message.reply_text(response, parse_mode="Markdown")
 
-    # chck if it is a merchant name , address  or logourl
-
     return ConversationHandler.END  # End conversation
 
 # Cancel command (if user wants to exit)
@@ -113,7 +111,10 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Conversation canceled.")
     return ConversationHandler.END
 
-
+async def create_payment(update:Update,context:ContextTypes.DEFAULT_TYPE):
+    # Collect payment credentials
+    # Create a Payment Link with the provided credentials
+    print("Print")
 
 
 # Define a handler for echoing text messages
@@ -132,9 +133,6 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/invoice – Manage and track your invoices.\n" +
         "/dashboard – Access an overview of your transactions and earnings."
         )
-
-async def signup(update:Update,context:ContextTypes.DEFAULT_TYPE):
-    await print("Signup")
 
 # Define an error handler
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
