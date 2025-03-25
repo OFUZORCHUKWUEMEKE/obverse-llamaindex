@@ -13,8 +13,9 @@ class UserSchema(BaseSchema):
     logo_url:Optional[str] = None
 
 class UpdateUser(BaseSchema):
-    username:Optional[str]
-    first_name:Optional[str]
-    last_name:Optional[str]
-    merchant_name:Optional[str]
-    logo_url:Optional[str]
+    username:Optional[str]=None
+    first_name:Optional[str]=None
+    last_name:Optional[str]=None
+    merchant_name:Optional[str]=None
+    logo_url:Optional[str]=None
+    wallet_addresses:Optional[str]=None

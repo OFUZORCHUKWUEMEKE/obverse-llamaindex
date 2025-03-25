@@ -25,7 +25,7 @@ async def get_users(page:int=1, limit:int=10):
     return users
 
 async def update_user(telegram_id:str, user:UpdateUser):
-    user_dict = user.dict(by_alias=True)
+    user_dict = user.dict(exclude_none=True)
     await users_collection.update_one({"telegram_id":telegram_id}, {"$set":user_dict})
     return {"message":"User updated successfully"}
 
