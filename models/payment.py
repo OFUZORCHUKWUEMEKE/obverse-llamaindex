@@ -1,7 +1,7 @@
 from .base import BaseSchema
 from enum import Enum
 from datetime import datetime
-from typing import Optional , Dict , Any
+from typing import Optional , Dict , Any,List
 
 
 class PaymentStatus(str, Enum):
@@ -17,14 +17,14 @@ class Currency(str,Enum):
 
 class PaymentSchema(BaseSchema):
     amount: float
-    currency: str=Currency.USDT
+    currency:str=Currency.USDT
     user_id: str
     status: PaymentStatus = PaymentStatus.PENDING
     chain: Chain = Chain.SOLANA
     reference: str
     created_at: datetime = datetime.utcnow()
     updated_at: datetime = datetime.utcnow()
-    details: Dict[str, Any] = {}
+    details: List[str] = []
     title: Optional[str]
     description: Optional[str] = None
     logo_url: Optional[str] = None

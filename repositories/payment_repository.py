@@ -2,10 +2,12 @@ from database.collections import payments_collection
 from models.payment import PaymentSchema
 
 
-async def create_payment(payment:PaymentSchema):
-    payment_dict = payment.dict(by_alias=True)
-    result = await payments_collection.insert_one(payment_dict)
-    return {**payment_dict, "_id": str(result.inserted_id)}
+async def create_payments(payment:PaymentSchema  | dict):
+   if isinstance(payment, dict):
+        payment = PaymentSchema(**payment)
+   payment_dict = payment.dict(by_alias=True)
+   result = await payments_collection.insert_one(payment_dict)
+   return {**payment_dict, "_id": str(result.inserted_id)}
 
 async def get_payment_by_user_id(user_id:str):
     try:

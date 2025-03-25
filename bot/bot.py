@@ -8,13 +8,15 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 from agents.agent import llm
 from core.config import config
 from repositories.user_repository import create_user,get_user,update_user
+from repositories.payment_repository import create_payments
 from models.user import UserSchema,UpdateUser
+from utils.utils import generate_reference
 
 # Define states for conversation
 SELECT_FIELD, UPDATE_VALUE = range(2)
 SELECTING_OPTION, WAITING_FOR_INPUT = range(2)
 
-TITLE,DESCRIPTION,LOGO_URL,AMOUNT,CONFIRM= range(5)
+TITLE,DESCRIPTION,LOGO_URL,AMOUNT,DETAILS,CONFIRM= range(6)
 
 
 async def start(update:Update,context:ContextTypes.DEFAULT_TYPE):
@@ -116,9 +118,6 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def create_payment(update:Update,context:ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Please Enter the title of your payment")
     return TITLE
-    # Collect payment credentials
-    # Create a Payment Link with the provided credentials
-    # print("Print")
 
 async def get_title(update:Update,context:ContextTypes.DEFAULT_TYPE):
     context.user_data['title'] = update.message.text
@@ -137,21 +136,24 @@ async def get_logo_url(update:Update,context:ContextTypes.DEFAULT_TYPE):
 
 async def get_amount(update:Update,context:ContextTypes.DEFAULT_TYPE):
     context.user_data['amount'] = update.message.text
-    # await update.message.reply_text("Enter the currency of the payment:")
+    await update.message.reply_text("Enter details you require your users to fill before making payments")
+    return DETAILS
+
+async def get_details(update:Update,context:ContextTypes.DEFAULT_TYPE):
+    context.user_data["details"] = update.message.text.split(',')
     payment_info = (f"Payment Details:\n"
                     f"Title: {context.user_data['title']}\n"
                     f"Description: {context.user_data['description']}\n"
                     f"Logo URL: {context.user_data['logo_url']}\n"
-                    f"Amount: {context.user_data['amount']}")
-    
-    await update.message.reply_text(payment_info, reply_markup=ReplyKeyboardRemove())
-    await update.message.reply_text("Please Confirm Payment Details")
+                    f"Amount: {context.user_data['amount']}\n"
+                    f"Details: {', '.join(context.user_data['details'])}"
+                    )
     keyboard = [
         [InlineKeyboardButton("Confirm", callback_data="confirm")],
         [InlineKeyboardButton("Cancel", callback_data="cancel")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text("Choose an option:", reply_markup=reply_markup)
+    await update.message.reply_text(payment_info, reply_markup=reply_markup)
     return CONFIRM
 
 async def confirm(update: Update,  context: ContextTypes.DEFAULT_TYPE):
@@ -159,7 +161,24 @@ async def confirm(update: Update,  context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     
     if query.data == "confirm":
-        await query.edit_message_text("Payment confirmed! Processing... ✅")
+        await query.edit_message_text("Creating Payment Link... ✅")
+        amount = context.user_data["amount"]
+        logo_url = context.user_data["logo_url"]
+        title = context.user_data["title"]
+        description = context.user_data["description"]
+        reference = generate_reference()
+        details = context.user_data["details"]
+        payment = await create_payments({
+            "amount":amount,
+            "logo_url":logo_url,
+            "title":title,
+            "description":description,
+            "user_id":str(query.from_user.id),
+            "reference":reference,
+            "details":details
+        })
+        await query.edit_message_text(f"Payment Link Created: https://www.obverse.com/payment/{payment['reference']}")
+
         return ConversationHandler.END
     else:
         await query.edit_message_text("Payment canceled. ❌")
@@ -212,6 +231,7 @@ def main():
             DESCRIPTION: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_description)],
             LOGO_URL: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_logo_url)],
             AMOUNT: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_amount)],
+            DETAILS: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_details)],
             CONFIRM: [CallbackQueryHandler(confirm)]
         },
         fallbacks=[CommandHandler("cancel", cancel)],
