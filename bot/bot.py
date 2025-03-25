@@ -14,6 +14,8 @@ from models.user import UserSchema,UpdateUser
 SELECT_FIELD, UPDATE_VALUE = range(2)
 SELECTING_OPTION, WAITING_FOR_INPUT = range(2)
 
+TITLE,DESCRIPTION,LOGO_URL,AMOUNT,CONFIRM= range(5)
+
 
 async def start(update:Update,context:ContextTypes.DEFAULT_TYPE):
     user_info = update.message.from_user
@@ -112,9 +114,56 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ConversationHandler.END
 
 async def create_payment(update:Update,context:ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Please Enter the title of your payment")
+    return TITLE
     # Collect payment credentials
     # Create a Payment Link with the provided credentials
-    print("Print")
+    # print("Print")
+
+async def get_title(update:Update,context:ContextTypes.DEFAULT_TYPE):
+    context.user_data['title'] = update.message.text
+    await update.message.reply_text("Enter the description of the payment:")
+    return DESCRIPTION
+
+async def get_description(update:Update,context:ContextTypes.DEFAULT_TYPE):
+    context.user_data['description'] = update.message.text
+    await update.message.reply_text("Enter the logo url of the payment:")
+    return LOGO_URL
+
+async def get_logo_url(update:Update,context:ContextTypes.DEFAULT_TYPE):
+    context.user_data['logo_url'] = update.message.text
+    await update.message.reply_text("Enter the amount of the payment: eg(10 , 20 ,10),i.e we only support USDT")
+    return AMOUNT
+
+async def get_amount(update:Update,context:ContextTypes.DEFAULT_TYPE):
+    context.user_data['amount'] = update.message.text
+    # await update.message.reply_text("Enter the currency of the payment:")
+    payment_info = (f"Payment Details:\n"
+                    f"Title: {context.user_data['title']}\n"
+                    f"Description: {context.user_data['description']}\n"
+                    f"Logo URL: {context.user_data['logo_url']}\n"
+                    f"Amount: {context.user_data['amount']}")
+    
+    await update.message.reply_text(payment_info, reply_markup=ReplyKeyboardRemove())
+    await update.message.reply_text("Please Confirm Payment Details")
+    keyboard = [
+        [InlineKeyboardButton("Confirm", callback_data="confirm")],
+        [InlineKeyboardButton("Cancel", callback_data="cancel")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_text("Choose an option:", reply_markup=reply_markup)
+    return CONFIRM
+
+async def confirm(update: Update,  context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    
+    if query.data == "confirm":
+        await query.edit_message_text("Payment confirmed! Processing... ✅")
+        return ConversationHandler.END
+    else:
+        await query.edit_message_text("Payment canceled. ❌")
+        return ConversationHandler.END
 
 
 # Define a handler for echoing text messages
@@ -156,9 +205,20 @@ def main():
         },
         fallbacks=[CommandHandler("cancel", cancel)],
     )
+    payment_handler = ConversationHandler(
+        entry_points=[CommandHandler("create_payment", create_payment)],
+        states={
+            TITLE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_title)],
+            DESCRIPTION: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_description)],
+            LOGO_URL: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_logo_url)],
+            AMOUNT: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_amount)],
+            CONFIRM: [CallbackQueryHandler(confirm)]
+        },
+        fallbacks=[CommandHandler("cancel", cancel)],
+    )
 
     application.add_handler(conv_handler)
-    # application.add_handler(CommandHandler("edit_profile",edit_profile))
+    application.add_handler(payment_handler)
 
     # Add error handler
     application.add_error_handler(error)

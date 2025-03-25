@@ -12,9 +12,12 @@ class PaymentStatus(str, Enum):
 class Chain(str, Enum):
     SOLANA = "solana"
 
+class Currency(str,Enum):
+    USDT="usdt"
+
 class PaymentSchema(BaseSchema):
     amount: float
-    currency: str
+    currency: str=Currency.USDT
     user_id: str
     status: PaymentStatus = PaymentStatus.PENDING
     chain: Chain = Chain.SOLANA
@@ -22,3 +25,6 @@ class PaymentSchema(BaseSchema):
     created_at: datetime = datetime.utcnow()
     updated_at: datetime = datetime.utcnow()
     details: Dict[str, Any] = {}
+    title: Optional[str]
+    description: Optional[str] = None
+    logo_url: Optional[str] = None
