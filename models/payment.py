@@ -1,7 +1,7 @@
 from .base import BaseSchema
 from enum import Enum
 from datetime import datetime
-from typing import Optional , Dict
+from typing import Optional , Dict , Any
 
 
 class PaymentStatus(str, Enum):
@@ -21,3 +21,4 @@ class PaymentSchema(BaseSchema):
     reference: str
     created_at: datetime = datetime.utcnow()
     updated_at: datetime = datetime.utcnow()
+    details: Dict[str, Any] = {}
