@@ -177,7 +177,7 @@ async def confirm(update: Update,  context: ContextTypes.DEFAULT_TYPE):
             "reference":reference,
             "details":details
         })
-        await query.edit_message_text(f"Payment Link Created: https://www.obverse.com/payment/{payment['reference']}")
+        await query.edit_message_text(f"Payment Link Created: https://pay.obverse.com/payment/{payment['reference']}")
 
         return ConversationHandler.END
     else:
@@ -199,7 +199,8 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/help – Get a list of available commands and how to use them.\n" +
         "/create_payment – Generate a payment request with ease.\n" +
         "/invoice – Manage and track your invoices.\n" +
-        "/dashboard – Access an overview of your transactions and earnings."
+        "/dashboard – Access an overview of your transactions and earnings.\n",+
+        "/agent - Chat with Agents"
         )
 
 # Define an error handler
