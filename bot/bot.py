@@ -156,7 +156,7 @@ async def get_details(update:Update,context:ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(payment_info, reply_markup=reply_markup)
     return CONFIRM
 
-async def confirm(update: Update,  context: ContextTypes.DEFAULT_TYPE):
+async def confirm(update: Update,  context: CallbackContext):
     query = update.callback_query
     await query.answer()
     
@@ -177,7 +177,16 @@ async def confirm(update: Update,  context: ContextTypes.DEFAULT_TYPE):
             "reference":reference,
             "details":details
         })
-        await query.edit_message_text(f"Payment Link Created: https://pay.obverse.com/payment/{payment['reference']}")
+        payment_link = "https://paypal.me/yourusername/10"
+        # image_url=f"https://pay.obverse.com/payment/{payment['reference']}"
+        image_url = "http://picsum.photos/200/200"
+        # await query.edit_message_text(f"Payment Link Created: https://pay.obverse.com/payment/{payment['reference']}")
+        await context.bot.send_photo(
+            chat_id=update.effective_chat.id,
+        photo=image_url,
+        caption=f"Here’s the payment link: [{payment_link}]({payment_link})",
+        parse_mode='Markdown'  # Makes the link clickable
+        )
 
         return ConversationHandler.END
     else:
