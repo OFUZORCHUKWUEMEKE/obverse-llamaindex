@@ -5,7 +5,7 @@
 import os
 from telegram import Update,ReplyKeyboardMarkup, ReplyKeyboardRemove,InlineKeyboardButton,InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler,CallbackContext, CallbackQueryHandler
-from agents.agent import llm
+# from agents.agent import llm
 from core.config import config
 from repositories.user_repository import create_user,get_user,update_user
 from repositories.payment_repository import create_payments
@@ -199,7 +199,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/help – Get a list of available commands and how to use them.\n" +
         "/create_payment – Generate a payment request with ease.\n" +
         "/invoice – Manage and track your invoices.\n" +
-        "/dashboard – Access an overview of your transactions and earnings.\n",+
+        "/dashboard – Access an overview of your transactions and earnings.\n"+
         "/agent - Chat with Agents"
         )
 
