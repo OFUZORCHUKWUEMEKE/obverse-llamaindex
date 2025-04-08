@@ -35,6 +35,10 @@ class PaymentSchema(BaseModel):
     title: Optional[str]
     description: Optional[str] = None
     logo_url: Optional[str] = None
+    model_config= ConfigDict(
+        populate_by_name=True,
+        aarbitrary_types_allowed=True,
+    )
 
 class PaymentCollection(BaseModel):
     payments:List[PaymentSchema]
