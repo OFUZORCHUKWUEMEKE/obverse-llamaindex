@@ -1,5 +1,5 @@
 from fastapi import APIRouter,HTTPException
-from repositories.user_repository import create_user , get_user
+from repositories.user_repository import create_user , get_user,getUsers
 from models.user import UserSchema
 from typing import Optional
 
@@ -14,4 +14,11 @@ async def get_user_endpoint(telegram_id:str):
     user = await get_user(telegram_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+@router.get("/users")
+async def getAllUsers():
+    user = await getUsers()
+    if not user:
+        raise HTTPException(status_code=400,detail="User not found")
     return user
