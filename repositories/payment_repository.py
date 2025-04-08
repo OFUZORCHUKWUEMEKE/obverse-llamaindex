@@ -19,7 +19,7 @@ async def get_payment_by_user_id(user_id:str):
         print(e)
 
 
-async def get_payment(reference:str):
+async def  get_payment(reference:str):
     try:
         payment = await payments_collection.find_one({"reference":payment_id})
         if payment:
