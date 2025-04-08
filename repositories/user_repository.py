@@ -2,6 +2,13 @@ from database.collections import users_collection
 from models.user import UserSchema, UpdateUser
 from bson import ObjectId
 
+async def getUsers():
+    count = await users_collection.count_documents({})
+    print(f"Document count: {count}")
+    results = await users_collection.find({}).to_list(length=100)
+    print(f"Results: {results}")
+    return results
+
 async def create_user(user:UserSchema):
     user_dict = user.dict(by_alias=True)
     result = await users_collection.insert_one(user_dict)

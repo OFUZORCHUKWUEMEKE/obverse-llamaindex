@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from repositories.payment_repository import create_payment,get_payment,get_payments_count,get_payment_by_user_id
+from repositories.payment_repository import create_payments,get_payment,get_payments_count,get_payment_by_user_id
 from models.payment import PaymentSchema
 
 router = APIRouter()
