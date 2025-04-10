@@ -23,12 +23,14 @@ async def get_payment(reference:str):
     """
     Get Payment by Reference
     """
-    if(
-        payment := payments_collection.find_one({"reference":reference})
-    )is not None:
+    payment = await payments_collection.find_one({"reference": reference})
+    if payment is not None:
+        # Convert ObjectId to string
+        payment["_id"] = str(payment["_id"])
         return payment
+    return None
 
-async def get_payments(page:int=1, limit:int=10):
+async def get_payments():
     """
     Get all Payments in the Platform
     """
