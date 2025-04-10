@@ -11,6 +11,7 @@ from repositories.user_repository import create_user,get_user,update_user
 from repositories.payment_repository import create_payments
 from models.user import UserSchema,UpdateUser
 from utils.utils import generate_reference
+from models.payment import PaymentSchema
 
 # Define states for conversation
 SELECT_FIELD, UPDATE_VALUE = range(2)
@@ -168,15 +169,16 @@ async def confirm(update: Update,  context: CallbackContext):
         description = context.user_data["description"]
         reference = generate_reference()
         details = context.user_data["details"]
-        payment = await create_payments({
-            "amount":amount,
-            "logo_url":logo_url,
-            "title":title,
-            "description":description,
-            "user_id":str(query.from_user.id),
-            "reference":reference,
-            "details":details
-        })
+        payment_data = PaymentSchema(
+            amount=amount,
+            logo_url=logo_url,
+            title=title,
+            description=description,
+            user_id=str(query.from_user.id),
+            reference=reference,
+            details=details
+        )
+        payment = await create_payments(payment_data)
         payment_link = "https://paypal.me/yourusername/10"
         # image_url=f"https://pay.obverse.com/payment/{payment['reference']}"
         image_url = "http://picsum.photos/200/200"

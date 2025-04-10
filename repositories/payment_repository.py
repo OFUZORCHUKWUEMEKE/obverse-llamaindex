@@ -1,43 +1,38 @@
 from database.collections import payments_collection
-from models.payment import PaymentSchema
+from models.payment import PaymentSchema,PaymentCollection
+from bson import ObjectId
 
-
-async def create_payments(payment:PaymentSchema  | dict):
-   if isinstance(payment, dict):
-        payment = PaymentSchema(**payment)
-   payment_dict = payment.dict(by_alias=True)
-   result = await payments_collection.insert_one(payment_dict)
-   return {**payment_dict, "_id": str(result.inserted_id)}
+async def create_payments(payment:PaymentSchema):
+    """
+    Create a new Payment handler
+    """
+    new_payments = await payments_collection.insert_one(
+        payment.model_dump(by_alias=True,exclude=["id"])
+    )
+    create_payments= await payments_collection.find_one({"_id":new_payments.inserted_id})
+    return create_payments
 
 async def get_payment_by_user_id(user_id:str):
-    try:
-        payment = await payments_collection.find_one({"user_id":user_id})
-        if payment:
-          payment["_id"] = str(payment["_id"])
-          return payment
-    except Exception as e:
-        print(e)
+    if(
+        payment := payments_collection.find({"user_id":user_id})
+    ) is not None:
+       return payment
 
 
-async def  get_payment(reference:str):
-    try:
-        payment = await payments_collection.find_one({"reference":payment_id})
-        if payment:
-          payment["_id"] = str(payment["_id"])
-          return payment
-    except Exception as e:
-        print(e)
-        return None
+async def get_payment(reference:str):
+    """
+    Get Payment by Reference
+    """
+    if(
+        payment := payments_collection.find_one({"reference":reference})
+    )is not None:
+        return payment
 
 async def get_payments(page:int=1, limit:int=10):
-    skip = (page-1)*limit
-    payments = await payments_collection.find().skip(skip).limit(limit).to_list(length=limit)
-    for payment in payments:
-        payment["_id"] = str(payment["_id"])
-    return payments
-
-async def get_payments_count():
-    return await payments_collection.count_documents({})
+    """
+    Get all Payments in the Platform
+    """
+    return PaymentCollection(payments = await payments_collection.find({}).to_list(1000))
 
 
 
